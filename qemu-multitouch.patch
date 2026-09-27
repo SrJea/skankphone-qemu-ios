@@ -1,0 +1,15 @@
+diff --git a/hw/arm/ipod_touch_multitouch.c b/hw/arm/ipod_touch_multitouch.c
+index 8a1c94d..bd34b40 100644
+--- a/hw/arm/ipod_touch_multitouch.c
++++ b/hw/arm/ipod_touch_multitouch.c
+@@ -200,7 +200,9 @@ static uint32_t ipod_touch_multitouch_transfer(SSIPeripheral *dev, uint32_t valu
+             s->out_buffer = (uint8_t *) s->next_frame;
+         }
+         else {
+-            hw_error("Unknown command 0x%02x!", value);
++            // parche local (iternalipod): un byte desconocido/0x00 en reposo se ignora en vez de abortar QEMU
++            printf("<MULTITOUCH> Ignoring unknown command 0x%02x\n", value);
++            s->buf_size = 1;
+         }
+     }
+ 

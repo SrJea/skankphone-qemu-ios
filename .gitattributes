@@ -1,0 +1,10 @@
+# Los scripts se ejecutan dentro de WSL: siempre LF (con CRLF bash falla)
+*.sh    text eol=lf
+*.py    text eol=lf
+*.patch text eol=lf
+# Scripts de Windows: CRLF
+*.bat   text eol=crlf
+*.cs    text eol=crlf
+*.md    text
+*.png   binary
+*.exe   binary

@@ -1,0 +1,10 @@
+# Nunca subir material de Apple ni imágenes pesadas (viven en WSL: ~/iternalipod/)
+*.img
+*.dmg
+*.bin
+*.tar.bz2
+nand/
+nand_*/
+prototype-fw/
+# Temporales
+*.ppm
