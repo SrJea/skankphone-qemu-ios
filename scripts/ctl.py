@@ -7,7 +7,9 @@ Uso: ctl.py encender [modo] | reiniciar [modo] | apagar | home | power | captura
 import socket, json, sys, time, os, zlib, struct, subprocess, datetime
 
 QMP = '/tmp/qmp.sock'; MON = '/tmp/qemu-mon.sock'
-ARRANCAR = '/mnt/f/Descargas/iternalipod/scripts/arrancar.sh'
+AQUI = os.path.dirname(os.path.abspath(__file__))
+ARRANCAR = os.path.join(AQUI, 'arrancar.sh')
+CAPTURAS = os.path.join(os.path.dirname(AQUI), 'capturas')   # carpeta capturas/ del repositorio
 MODOS = ('skankphone', 'original', 'springboard')
 
 def qmp(*commands):
@@ -27,7 +29,7 @@ def tecla(qcode):
     qmp(ev(True)); time.sleep(0.15); qmp(ev(False))
 
 def captura():
-    out = '/mnt/f/Descargas/iternalipod/capturas'; os.makedirs(out, exist_ok=True)
+    out = CAPTURAS; os.makedirs(out, exist_ok=True)
     s = socket.socket(socket.AF_UNIX); s.settimeout(3); s.connect(MON)
     try: s.recv(4096)
     except OSError: pass
@@ -37,7 +39,9 @@ def captura():
     ch = lambda t, b: struct.pack('>I', len(b)) + t + b + struct.pack('>I', zlib.crc32(t + b) & 0xffffffff)
     png = b'\x89PNG\r\n\x1a\n' + ch(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0)) + ch(b'IDAT', zlib.compress(raw)) + ch(b'IEND', b'')
     name = f'{out}/captura_{datetime.datetime.now():%Y%m%d_%H%M%S}.png'; open(name, 'wb').write(png)
-    return name.replace('/mnt/f/', 'F:\\').replace('/', '\\')
+    if name.startswith('/mnt/') and name[6:7] == '/':   # en WSL, mostrar la ruta de Windows
+        name = name[5].upper() + ':' + name[6:].replace('/', '\\')
+    return name
 
 def vivo():
     return subprocess.run(['pgrep', '-f', 'qemu-system-arm'], capture_output=True).returncode == 0

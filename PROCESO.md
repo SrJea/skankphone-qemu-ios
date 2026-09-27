@@ -181,6 +181,8 @@ táctil) ahora se ignora como transferencia de 1 byte en vez de llamar a `hw_err
 | 15 | Fechas de archivos añadidos con xpwn salen como `8/24/2026` (hoy es 24/09) | Desfase de mes en xpwn | Cosmético, sin efecto |
 | 16 | Reinicio en caliente con QMP `system_reset`: el iPod se queda colgado en `iBoot start` (>150 s) | Los periféricos de qemu-ios (NAND, PMU, LCD…) no implementan el reset | "Reinicio rápido" = apagar QEMU (`quit` por QMP, `pkill -9` si no responde) y relanzarlo; el arranque completo hasta SkankPhone tarda ~7 s |
 | 17 | QEMU lanzado desde una llamada `wsl.exe` que termina podría morir con ella | Ciclo de vida de la sesión de WSL | Lanzarlo con `setsid` (verificado: sigue vivo tras cerrarse la sesión) |
+| 18 | Instalador de Debian: se paraba en silencio al copiar SkankPhone | Con `set -e`, una función cuyo bucle acababa en `es_macho && chmod` devolvía 1 si el último archivo no era Mach-O | `if … then … fi` + `return 0`, y un `trap ERR` que indica la línea del fallo |
+| 19 | Instalador de Debian: fsck con `Incorrect number of thread records` e `Invalid directory item count` | El `mkdir` de xpwn no comprueba si el directorio existe: hacer `mkdir /System` o `/System/Library` sobre directorios existentes duplica registros del catálogo | Crear solo los directorios nuevos; el instalador ahora **se detiene** si fsck encuentra errores que no sean los avisos cosméticos de la línea base |
 
 ## Limitaciones conocidas
 - Sin red/WiFi en el emulador → Web, Ping, iPerf, tests de WiFi fallan (`Apple80211GetIfListCopy failed, error: -4`).
@@ -189,6 +191,7 @@ táctil) ahora se ignora como transferencia de 1 byte en vez de llamar a `hw_err
 - Modo `springboard`: el icono aparece pero la app aborta (fallo 12). Solo es útil para comparar.
 
 ## Archivos
+- `GUIA_DEBIAN.md` + `debian/instalar.sh` + `debian/accesos.sh`: instalación y uso en Debian nativo
 - `Panel iPod.exe` + `panel/` (código C# y `compilar.bat`) + `scripts/ctl.py`: panel de control
 - `capturas/`: capturas de cada fase (vía `screendump` del monitor QEMU → PNG con `shot.py`)
 - `qemu-multitouch.patch`: parche de QEMU

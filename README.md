@@ -10,14 +10,22 @@ SkankPhone no es una app normal: en el prototipo hacía de **shell del sistema**
 Aquí se lanza con launchd en lugar de SpringBoard y funciona: menú principal, táctil, navegador con los
 marcadores de 2007 y sus tests internos.
 
+## Empezar
+
+- **Debian / Linux**: [**GUIA_DEBIAN.md**](GUIA_DEBIAN.md). Instalación en un comando: `bash debian/instalar.sh`
+- **Windows + WSL**: `Panel iPod.exe` (panel con reinicio rápido) o `SkankPhone.bat`; ver [PROCESO.md](PROCESO.md)
+
 ## Contenido
 
 | Ruta | Qué es |
 |---|---|
-| [`PROCESO.md`](PROCESO.md) | **Documentación completa**: cada paso, decisiones y 17 fallos con causa y solución |
+| [`GUIA_DEBIAN.md`](GUIA_DEBIAN.md) | **Guía de uso en Debian**: instalación, arranque, controles, reinicio rápido, accesos directos, VNC, problemas |
+| [`debian/instalar.sh`](debian/instalar.sh) | Instalador completo (dependencias, descargas, compilación, imágenes y NAND) |
+| [`debian/accesos.sh`](debian/accesos.sh) | Accesos directos en el menú de aplicaciones de Linux |
+| [`PROCESO.md`](PROCESO.md) | **Documentación completa**: cada paso, decisiones y 19 fallos con causa y solución |
 | `Panel iPod.exe` · [`panel/`](panel) | Panel de control (WinForms): reinicio rápido (F5), Home, Reposo, capturas, log |
-| [`scripts/ctl.py`](scripts/ctl.py) · [`scripts/arrancar.sh`](scripts/arrancar.sh) | Control y arranque del emulador desde WSL |
-| [`scripts/build/`](scripts/build) | Scripts usados para construirlo todo (descargas, compilación, inyección en HFS+, parche de SpringBoard, análisis Mach-O…) |
+| [`scripts/ctl.py`](scripts/ctl.py) · [`scripts/arrancar.sh`](scripts/arrancar.sh) | Control y arranque del emulador (Debian o WSL) |
+| [`scripts/build/`](scripts/build) | Scripts del proceso manual original (análisis Mach-O, ingeniería inversa de SpringBoard…). Para instalar, usa `debian/instalar.sh` |
 | [`qemu-multitouch.patch`](qemu-multitouch.patch) | Parche de qemu-ios para que la emulación del táctil no tumbe QEMU |
 | `capturas/` | Capturas de cada fase |
 
@@ -29,9 +37,9 @@ ni las imágenes NOR/NAND. Todo eso se descarga o genera con los scripts de `scr
 
 ## Requisitos
 
-- Windows 11 con WSL2 (distro `Debian`) y WSLg
-- Las rutas están fijadas a `F:\Descargas\iternalipod` (Windows) y `~/iternalipod` (WSL); si usas otras, ajústalas en
-  `scripts/arrancar.sh`, `scripts/ctl.py` y `panel/PanelIPod.cs`
+- **Debian 12/13 (amd64)** con escritorio, o **Windows 11 con WSL2** (distro `Debian`) y WSLg
+- Los scripts usan rutas relativas al repositorio y `~/iternalipod` (cambiable con `ITERNALIPOD=`).
+  Solo el panel de Windows (`panel/PanelIPod.cs`) tiene fijada la ruta `F:\Descargas\iternalipod`
 
 ## Créditos
 
