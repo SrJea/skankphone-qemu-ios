@@ -1,0 +1,49 @@
+# Creates the v1.0.0 release from main: a Debian package (tar.gz) and a
+# Windows + WSL package (zip), plus SHA256SUMS. Runs on push to this branch.
+name: release
+
+on:
+  push:
+    branches: ["claude/release-v1.0.0"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      V: "1.0.0"
+      TAG: v1.0.0
+      TITLE: "SkankPhone 1.0 — iPhone OS 1 (1A420) en qemu-ios para Debian y Windows"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: notes
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: src
+          fetch-depth: 0
+      - name: packages
+        run: |
+          mkdir dist
+          cd src
+          git archive --format=tar.gz --prefix=skankphone-$V/ -o ../dist/skankphone-$V-debian.tar.gz HEAD \
+            README.md GUIA_DEBIAN.md PROCESO.md debian scripts qemu-multitouch.patch capturas
+          git archive --format=zip --prefix=skankphone-$V/ -o ../dist/skankphone-$V-windows-wsl.zip HEAD \
+            README.md GUIA_DEBIAN.md PROCESO.md "Panel iPod.exe" SkankPhone.bat iPod_original.bat \
+            panel scripts debian qemu-multitouch.patch capturas
+          cd ../dist && sha256sum * > SHA256SUMS && cat SHA256SUMS
+      - name: release
+        run: |
+          main=$(git -C src rev-parse HEAD)
+          if ! gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" -R "$GITHUB_REPOSITORY" --draft --target "$main" \
+              --title "$TITLE" --notes-file notes/.github/release-notes-v1.0.0.md
+          fi
+          gh release upload "$TAG" -R "$GITHUB_REPOSITORY" --clobber dist/*
+          gh release edit "$TAG" -R "$GITHUB_REPOSITORY" --draft=false --latest
+          gh release view "$TAG" -R "$GITHUB_REPOSITORY"
